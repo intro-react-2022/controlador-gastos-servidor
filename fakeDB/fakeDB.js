@@ -336,6 +336,40 @@ export default class FakeDB {
       payload: FakeDB.usuarios,
     };
   };
+  static iniciarSesion = (correo, contrasenia) => {
+    if(!correo || !contrasenia || correo.length===0 || contrasenia.length===0){
+      return {
+        ok: false,
+        message: "Credenciales incorrectas o vacías",
+        payload: {},
+      };
+    }
+    const usuarioEncontrado = FakeDB.usuarios.filter(
+      (x) => x.correo === correo
+    );
+    if (usuarioEncontrado && usuarioEncontrado.length === 1) {
+      //preguntamos contraseña
+      if (usuarioEncontrado[0].contrasenia === contrasenia) {
+        return {
+          ok: true,
+          message: "Inicio de sesión correcto",
+          payload: { ...usuarioEncontrado[0], contrasenia: undefined },
+        };
+      }else{
+        return {
+          ok: false,
+          message: "Contraseña incorrecta",
+          payload: {},
+        };
+      }
+    } else {
+      return {
+        ok: false,
+        message: "Correo incorrecto",
+        payload: {},
+      };
+    }
+  };
   //ACTIVIDAD
   static listarActividades = () => {
     return {

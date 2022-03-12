@@ -1,15 +1,10 @@
-// const express = require("express");
-// const fileUpload = require("express-fileupload");
-// const cors = require("cors");
-// const bodyParser = require("body-parser");
-//const morgan = require("morgan");
-//const _ = require("lodash");
-//const { FakeDB } = require("./fakeDB/fakeDB");
 import express from "express";
 import bodyParser from "body-parser";
+
 import fileUpload from "express-fileupload";
 import cors from "cors";
 import morgan from "morgan";
+
 import FakeDB from "./fakeDB/fakeDB.js";
 
 const app = express();
@@ -63,16 +58,24 @@ app.post("/upload-my-file", async (req, res) => {
 
 app.get("/", (req, res) => {
   res.send({
-    status: true,
+    ok: true,
     message: "Server is working!",
     payload: {},
   });
 });
 
 app.get("/usuario", (req, res) => {
-  res.send(FakeDB.listarUsuario());
+  res.send(FakeDB.usuarios);
 });
 
+app.post("/usuario/auth", (req, res) => {
+  const { correo, contrasenia } = req.body;
+  console.log("Se recibio: ", correo, contrasenia);
+  const result = FakeDB.iniciarSesion(correo, contrasenia);
+  console.log("Se obtuvo: ", result);
+
+  res.send(result);
+});
 app.get("/actividad", (req, res) => {
   res.send(FakeDB.listarActividades());
 });
