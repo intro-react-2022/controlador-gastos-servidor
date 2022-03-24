@@ -12,7 +12,11 @@ const app = express();
 // enable files upload
 app.use(fileUpload({ createParentPath: true }));
 //add other middleware
-app.use(cors());
+var corsOptions = {
+  origin: "http://localhost:3000",
+  //optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
@@ -65,7 +69,8 @@ app.get("/", (req, res) => {
 });
 
 app.get("/usuario", (req, res) => {
-  res.send(FakeDB.usuarios);
+  //res.send(FakeDB.usuarios);
+  res.send(FakeDB.listarUsuario());
 });
 
 app.post("/usuario/auth", (req, res) => {
@@ -79,12 +84,24 @@ app.post("/usuario/auth", (req, res) => {
 app.get("/actividad", (req, res) => {
   res.send(FakeDB.listarActividades());
 });
-
+/**
+ * Carga masiva
+ */
 app.post("/actividad", (req, res) => {
   const { idUsuario, denominacion, monto, transacciones } = req.body;
+  console.log(idUsuario, denominacion, monto, transacciones);
   res.send(
     FakeDB.insertarActividad(idUsuario, denominacion, monto, transacciones)
   );
+});
+app.put("/actividad", (req, res) => {
+  const { denominacion, idActividad } = req.body;
+  res.send(FakeDB.updateActividad(idActividad, denominacion));
+});
+app.delete("/actividad", (req, res) => {
+  const { idActividad } = req.body;
+  console.log(req.body);
+  res.send(FakeDB.deleteActividad(idActividad));
 });
 //OK
 app.get("/actividad/:idUsuario", (req, res) => {
@@ -101,7 +118,18 @@ app.post("/transaccion", (req, res) => {
   console.log("BODY", req.body);
   res.send(FakeDB.insertarTransaccion(idActividad, transaccion));
 });
+/**
+{ 
+  transacciones: {
 
+  }
+}
+ */
+app.post("/transaccion/importar", (req, res) => {
+  const { transacciones } = req.body;
+  console.log("BODY", req.body);
+  res.send(FakeDB.insertarTransaccion(idActividad, transaccion));
+});
 app.get("/transaccion/:idActividad", (req, res) => {
   const { idActividad } = req.params;
   res.send(FakeDB.listarTransaccionesXidActividad(idActividad));

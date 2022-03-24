@@ -12,7 +12,8 @@ export default class FakeDB {
       sectorLaboral: "",
       telefono: "6562974999951",
       contrasenia: "1234",
-      imagen: "https://randomuser.me/api/portraits/med/women/28.jpg",
+      imagen:
+        "https://img.wattpad.com/9455c65d6b0902abd0d762fc63603b9dda4f8bcb/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f776174747061642d6d656469612d736572766963652f53746f7279496d6167652f784d72554b68356d3654434361773d3d2d3832343834373635392e313566363164313432373939363337333234393731383334383934392e6a7067?s=fit&w=720&h=720",
     },
     {
       idUsuario: 2,
@@ -45,13 +46,13 @@ export default class FakeDB {
     },
   ];
   static actividad = [
-    {
+    /*  {
       idUsuario: 1,
       idActividad: 1,
       denominacion: "Dia navideño",
       monto: 2405,
       fecha: new Date(),
-    },
+    }, */
     {
       idUsuario: 1,
       idActividad: 2,
@@ -337,7 +338,12 @@ export default class FakeDB {
     };
   };
   static iniciarSesion = (correo, contrasenia) => {
-    if(!correo || !contrasenia || correo.length===0 || contrasenia.length===0){
+    if (
+      !correo ||
+      !contrasenia ||
+      correo.length === 0 ||
+      contrasenia.length === 0
+    ) {
       return {
         ok: false,
         message: "Credenciales incorrectas o vacías",
@@ -355,7 +361,7 @@ export default class FakeDB {
           message: "Inicio de sesión correcto",
           payload: { ...usuarioEncontrado[0], contrasenia: undefined },
         };
-      }else{
+      } else {
         return {
           ok: false,
           message: "Contraseña incorrecta",
@@ -442,6 +448,59 @@ export default class FakeDB {
         },
       };
     }
+  };
+  static updateActividad = (idActividad, denominacion) => {
+    //buscar por id
+    const actividadEncontrada = FakeDB.transaccion.filter(
+      (tx) => tx.idActividad === idActividad
+    );
+    if (actividadEncontrada && actividadEncontrada.length === 1) {
+      let actividadVar = actividadEncontrada[0];
+      actividadVar.denominacion = denominacion;
+
+      const listaActividadActualizada = FakeDB.transaccion.map((tx) => {
+        if (tx.idActividad == idActividad) {
+          return actividadVar;
+        } else {
+          return tx;
+        }
+      });
+
+      FakeDB.actividad = [...listaActividadActualizada];
+      return {
+        ok: true,
+        payload: actividadVar,
+        message: "Actividad con id " + idActividad + " actualizada",
+      };
+    } else {
+      return {
+        ok: false,
+        payload: {},
+        message: "Error al editar actividad",
+      };
+    }
+
+    //acutalizar a la fakeDB
+    //retornar el objeto actividad
+  };
+  static deleteActividad = (idActividad) => {
+    //buscar por id
+    console.log(idActividad);
+   // console.log(FakeDB.transaccion);
+   //console.log(FakeDB.transaccion.filter((tx) => tx.idActividad != idActividad));
+    FakeDB.transaccion = [
+      ...FakeDB.transaccion.filter((tx) => tx.idActividad != idActividad),
+    ];
+    FakeDB.actividad = [
+      ...FakeDB.actividad.filter((tx) => tx.idActividad != idActividad),
+    ];
+    return {
+      ok: true,
+      payload: idActividad,
+      message: "actividad y transacciones eliminadas",
+    };
+    //acutalizar a la fakeDB
+    //retornar el objeto actividad
   };
   //TRANSACCIONES
   static insertarTransaccion = (nuevaTransaccion) => {
